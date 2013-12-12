@@ -1,0 +1,9 @@
+# C# objects and libs
+bakaTest/bin/*
+bakaTest/obj/*
+
+
+# VS2010 - files
+*.sln
+*.suo
+*.csproj
