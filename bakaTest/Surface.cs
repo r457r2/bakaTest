@@ -28,6 +28,18 @@ namespace bakaTest
             get { return curves[curve]; }
         }
 
+        public void AddCurve()
+        {
+            curves.Add(new List<Matrix>());
+        }
+
+        public Surface(int ncurves_, int nsteps_)
+        {
+            ncurves = ncurves_;
+            nsteps = nsteps_;
+            curves = new List<List<Matrix>>();
+        }
+
         public Surface(int ncurves_, double zshift, double zinitial, int nsteps_, double xstep, double xinitial, double angle, Func<double, double> func)
         {
             ncurves = ncurves_;
