@@ -13,7 +13,8 @@ namespace bakaTest
     {
         public MainForm()
         {
-            SurfaceRenderer renderer = new SurfaceRenderer(new Surface(50, 1.2, 10, 250, 0.4, 2, 0.4, x => Math.Sin(x)));
+            SurfaceRenderer renderer = new SurfaceRenderer(new Surface(50, 1.5, 4, 250, 0.4, 4, 0.4, x => Math.Sin(x) + Math.Sin(2*x) + Math.Sin(3*x) + Math.Sin(4*x)));
+
             this.Size = new Size(1280, 720);
             renderer.Size = new Size(1280, 720);
 

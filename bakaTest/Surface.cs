@@ -68,10 +68,11 @@ namespace bakaTest
                 for (int j = 0; j < nsteps; ++j)
                 {
                     Matrix m = new Matrix(1, 4);
-                    m[0][0] = curves[i][j][0][0] + xshift;
-                    m[0][1] = curves[i][j][0][1];
-                    m[0][2] = curves[i][j][0][2] + zshift;
+                    m[0][0] = curves[i - 1][j][0][0] + xshift;
+                    m[0][1] = curves[i - 1][j][0][1];
+                    m[0][2] = curves[i - 1][j][0][2] + zshift;
                     m[0][3] = 1;
+                    curve.Add(m);
                 }
                 curves.Add(curve);
             }
