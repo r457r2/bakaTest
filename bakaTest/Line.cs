@@ -32,15 +32,15 @@ namespace bakaTest
         {
             begin = new Matrix(1, 4);
             begin[0][0] = x1;
-            begin[0][0] = y1;
-            begin[0][0] = z1;
-            begin[0][0] = 1;
+            begin[0][1] = y1;
+            begin[0][2] = z1;
+            begin[0][3] = 1;
 
             end = new Matrix(1, 4);
             end[0][0] = x2;
-            end[0][0] = y2;
-            end[0][0] = z2;
-            end[0][0] = 1;
+            end[0][1] = y2;
+            end[0][2] = z2;
+            end[0][3] = 1;
         }
     }
 }

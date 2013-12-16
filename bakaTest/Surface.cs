@@ -33,17 +33,17 @@ namespace bakaTest
             curves.Add(new List<Matrix>());
         }
 
-        public Surface(int ncurves_, int nsteps_)
+        public Surface(int _ncurves, int _nsteps)
         {
-            ncurves = ncurves_;
-            nsteps = nsteps_;
+            ncurves = _ncurves;
+            nsteps = _nsteps;
             curves = new List<List<Matrix>>();
         }
 
-        public Surface(int ncurves_, double zshift, double zinitial, int nsteps_, double xstep, double xinitial, double angle, Func<double, double> func)
+        public Surface(int _ncurves, double zshift, double zinitial, int _nsteps, double xstep, double xinitial, double angle, Func<double, double> func)
         {
-            ncurves = ncurves_;
-            nsteps = nsteps_;
+            ncurves = _ncurves;
+            nsteps = _nsteps;
             curves = new List<List<Matrix>>();
 
             // calculating initial curve
@@ -61,7 +61,7 @@ namespace bakaTest
             curves.Add(curve);
 
             // calculating copies
-            double xshift = Math.Sin(angle) * zshift;
+            double xshift = (zshift / Math.Sin(angle)) * Math.Cos(angle);
             for (int i = 1; i < ncurves; ++i)
             {
                 curve = new List<Matrix>();

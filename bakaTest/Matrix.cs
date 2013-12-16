@@ -5,23 +5,21 @@
     public class Matrix
     {
         private double[][] mtx = null;
-        private int nstr, ncol;
-        private int p;
-        private int p_2;
+        public int nstr, ncol;
 
-        public Matrix(int nstr_, int ncol_)
+        public Matrix(int _nstr, int _ncol)
         {
-            nstr = nstr_;
-            ncol = ncol_;
+            nstr = _nstr;
+            ncol = _ncol;
 
             mtx = new double[nstr][];
             for (int i = 0; i < nstr; ++i)
                 mtx[i] = new double[ncol];
 
-            zfill();
+            fillZero();
         }
 
-        public void zfill()
+        public void fillZero()
         {
             for (int i = 0; i < nstr; ++i)
                 for (int j = 0; j < ncol; ++j)
