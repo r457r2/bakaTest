@@ -9,11 +9,11 @@ using System.Windows.Forms;
 
 namespace bakaTest
 {
-    public partial class Form1 : Form
+    public partial class MainForm : Form
     {
-        public Form1()
+        public MainForm()
         {
-            SurfaceRenderer renderer = new SurfaceRenderer(new Surface(0, 0));
+            SurfaceRenderer renderer = new SurfaceRenderer(new Surface(50, 1.2, 10, 250, 0.4, 2, 0.4, x => Math.Sin(x)));
             this.Size = new Size(1280, 720);
             renderer.Size = new Size(1280, 720);
 
