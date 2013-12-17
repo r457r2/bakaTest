@@ -9,9 +9,6 @@ namespace bakaTest
 {
     class SurfaceRenderer : Control
     {
-        //for y-correction output
-        int ysize = 720;
-
         // surfaces
         private Surface surface;
         private Surface renderedSurface;
@@ -32,7 +29,7 @@ namespace bakaTest
         private Matrix transformationMatrix = new Matrix(4, 4);
 
         // matrices' parameters
-        private const double unitVectorLength = 200;
+        private const double unitVectorLength = 100;
         private double scale = 6;
         private double shiftX = 640, shiftY = 380, shiftZ = 0;
         private double rotationOX = Math.PI / 4, rotationOY = Math.PI / 4, rotationOZ = 0;
@@ -44,11 +41,11 @@ namespace bakaTest
         private Color ozColor   = Color.FromArgb(0x7b, 0x3f, 0x00);
         private Color meshColor = Color.FromArgb(0x00, 0x00, 0x00);
 
-        private List<Color> colors;
+        private List<Color> colors = new List<Color>();
 
         // misc
-        public bool showMesh = true;
-        public bool showColors = false;
+        public bool showMesh = false;
+        public bool showColors = true;
 
         // accessors
         public Surface Surface
@@ -56,25 +53,12 @@ namespace bakaTest
             set { surface = value; }
         }
 
-
         ///////////////////////////////////////////////////////////
         // Methods
-        private void mtxToConsole(Matrix one)
-        {
-            for (int i = 0; i < one.nstr; i++)
-            {
-                for (int j = 0; j < one.ncol; j++)
-                {
-                    Console.Write(one[i][j] + " ");
-                }
-                Console.WriteLine();
-            }
-            Console.WriteLine();
-        }
 
-        private Matrix yCorrection(Matrix one)
+        private Matrix toWindow(Matrix one)
         {
-            one[0][1] = ysize - one[0][1];
+            one[0][1] = this.Height - one[0][1];
             return one;
         }
 
@@ -83,6 +67,12 @@ namespace bakaTest
             surface = _surface;
             calculateColors();
             calculateTransformationMatrix();
+
+            this.SetStyle(ControlStyles.UserPaint, true);
+            this.SetStyle(ControlStyles.AllPaintingInWmPaint, true);
+            this.SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
+            this.SetStyle(ControlStyles.ResizeRedraw, true);
+            this.UpdateStyles();
         }
 
         // Matrix
@@ -154,11 +144,35 @@ namespace bakaTest
         }
 
         // Colors
+        private int invertIfNegative(int value)
+        {
+            if (value < 0)
+                return 255 + value;
+            return value;
+        }
+
+
         private void calculateColors()
         {
             for (int i = 0; i < surface.StepsNumber - 1; ++i)
             {
+                Matrix v1 = surface[1][i] - surface[0][i];
+                Matrix v2 = surface[0][i+1] - surface[0][i];
 
+                double x = v1[0][1] * v2[0][2] - v1[0][2] * v2[0][1];
+                double y = v1[0][2] * v2[0][0] - v1[0][0] * v2[0][2];
+                double z = v1[0][0] * v2[0][1] - v1[0][1] * v2[0][0];
+                double length = Math.Sqrt(x*x + y*y + z*z);
+
+                int r = (int) (x / length * 255);
+                int g = (int) (y / length * 255);
+                int b = (int) (z / length * 255);
+
+                r = invertIfNegative(r);
+                g = invertIfNegative(g);
+                b = invertIfNegative(b);
+                
+                colors.Add(Color.FromArgb(r, g, b)); 
             }
             return;
         }
@@ -172,20 +186,20 @@ namespace bakaTest
             {
                 renderedSurface.AddCurve();
                 for (int j = 0; j < surface.StepsNumber; ++j)
-                    renderedSurface[i].Add(yCorrection(surface[i][j] * transformationMatrix));
+                    renderedSurface[i].Add(toWindow(surface[i][j] * transformationMatrix));
                 
             }
             // axes
-            renderedOxAxis.Begin = yCorrection(oxAxis.Begin * transformationMatrix);
-            renderedOyAxis.Begin = yCorrection(oyAxis.Begin * transformationMatrix);
-            renderedOzAxis.Begin = yCorrection(ozAxis.Begin * transformationMatrix);
+            renderedOxAxis.Begin = toWindow(oxAxis.Begin * transformationMatrix);
+            renderedOyAxis.Begin = toWindow(oyAxis.Begin * transformationMatrix);
+            renderedOzAxis.Begin = toWindow(ozAxis.Begin * transformationMatrix);
 
-            renderedOxAxis.End = yCorrection(oxAxis.End * transformationMatrix);
-            renderedOyAxis.End = yCorrection(oyAxis.End * transformationMatrix);
-            renderedOzAxis.End = yCorrection(ozAxis.End * transformationMatrix);
+            renderedOxAxis.End = toWindow(oxAxis.End * transformationMatrix);
+            renderedOyAxis.End = toWindow(oyAxis.End * transformationMatrix);
+            renderedOzAxis.End = toWindow(ozAxis.End * transformationMatrix);
         }
 
-        private Color getColor(int i, int j, int im, int jm)
+        private Color getColorByPointIndex(int i, int j, int im, int jm)
         {
             int r = 255*i;
             r /= im;
@@ -262,12 +276,12 @@ namespace bakaTest
                 for(int i = 0; i < renderedSurface.CurvesNumber - 1; ++i)
                     for (int j = 0; j < renderedSurface.StepsNumber - 1; ++j)
                     {
-                        SolidBrush polyBrush = new SolidBrush(getColor(i, j, renderedSurface.CurvesNumber, renderedSurface.StepsNumber));
+                        SolidBrush polyBrush = new SolidBrush(colors[j]);//getColorByPointIndex(i, j, renderedSurface.CurvesNumber, renderedSurface.StepsNumber));
                         Point [] p = new Point[4];
                         p[0] = new Point((int) renderedSurface[i][j][0][0], (int) renderedSurface[i][j][0][1]);
-                        p[0] = new Point((int) renderedSurface[i][j+1][0][0], (int) renderedSurface[i][j+1][0][1]);
-                        p[0] = new Point((int) renderedSurface[i+1][j+1][0][0], (int) renderedSurface[i+1][j+1][0][1]);
-                        p[0] = new Point((int) renderedSurface[i+1][j][0][0], (int) renderedSurface[i+1][j][0][1]);
+                        p[1] = new Point((int) renderedSurface[i][j+1][0][0], (int) renderedSurface[i][j+1][0][1]);
+                        p[2] = new Point((int) renderedSurface[i+1][j+1][0][0], (int) renderedSurface[i+1][j+1][0][1]);
+                        p[3] = new Point((int) renderedSurface[i+1][j][0][0], (int) renderedSurface[i+1][j][0][1]);
                         g.FillPolygon(polyBrush, p);
                     }
             }
@@ -279,53 +293,49 @@ namespace bakaTest
             base.OnKeyPress(ev);
             switch (ev.KeyChar)
             {
-                case (char) Keys.Up:
+                case (char) Keys.I:
                     rotationOX += 0.05;
                     break;
 
-                case (char)Keys.Down:
+                case (char)Keys.K:
                     rotationOX -= 0.05;
                     break;
 
-                case (char)Keys.Left:
+                case (char)Keys.J:
+                    rotationOY -= 0.05;
+                    break;
+
+                case (char)Keys.L:
                     rotationOY += 0.05;
-                    break;
-
-                case (char)Keys.Right:
-                    rotationOX += 0.05;
-                    break;
-
-
-                case (char)Keys.Space:
-                    break;
-
-                case (char)Keys.C:
                     break;
 
 
                 case (char)Keys.W:
-                    shiftY += 5;
+                    shiftY -= 10;
                     break;
 
                 case (char)Keys.A:
-                    shiftX -= 5;
+                    shiftX += 10;
                     break;
 
                 case (char)Keys.S:
-                    shiftY -= 5;
+                    shiftY += 10;
                     break;
 
                 case (char)Keys.D:
-                    shiftX += 5;
+                    shiftX -= 10;
                     break;
+
 
 
                 case (char)Keys.R:
-                    scale += 1;
+                    scale += 0.3;
                     break;
 
                 case (char)Keys.F:
-                    scale -= 1;
+                    scale -= 0.3;
+                    if (scale < 0)
+                        scale = 0.01;
                     break;
 
                 default:
