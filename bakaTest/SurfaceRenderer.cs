@@ -147,10 +147,9 @@ namespace bakaTest
         private int invertIfNegative(int value)
         {
             if (value < 0)
-                return 255 + value;
+                return 0;//return 255 + value;
             return value;
         }
-
 
         private void calculateColors()
         {
@@ -287,6 +286,35 @@ namespace bakaTest
             }
         }
 
+        protected override void OnMouseWheel(MouseEventArgs e)
+        {
+            base.OnMouseWheel(e);
+            double old_scale = scale;
+            scale += scale* 0.005 * e.Delta; // the idea is to zoom `equally` in any scale
+            if (scale < 0 || scale > 1e5)
+                scale = old_scale;
+            calculateTransformationMatrix();
+            this.Refresh();
+        }
+
+        private int lastX, lastY;
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            base.OnMouseMove(e);
+            if(e.Button == MouseButtons.Left)
+            {
+                double dy = e.Y - lastY;
+                double dx = e.X - lastX;
+
+                rotationOX += (dy / this.Height) * 3.14;
+                rotationOY += (dx / this.Width) * 3.14;
+                calculateTransformationMatrix();
+                this.Refresh();
+            }
+            lastX = e.X;
+            lastY = e.Y;
+        }
+
         // User input
         protected override void OnKeyPress(KeyPressEventArgs ev)
         {
@@ -311,19 +339,19 @@ namespace bakaTest
 
 
                 case (char)Keys.W:
-                    shiftY -= 10;
+                    shiftY -= 20;
                     break;
 
                 case (char)Keys.A:
-                    shiftX += 10;
+                    shiftX += 20;
                     break;
 
                 case (char)Keys.S:
-                    shiftY += 10;
+                    shiftY += 20;
                     break;
 
                 case (char)Keys.D:
-                    shiftX -= 10;
+                    shiftX -= 20;
                     break;
 
 
