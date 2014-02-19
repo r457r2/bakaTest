@@ -9,9 +9,9 @@ namespace bakaTest
 {
     class SurfaceRenderer : Control
     {
-        // surfaces
-        private Surface surface;
-        private Surface renderedSurface;
+        // bodies
+        private Body body;
+        private Body renderedBody;
 
         // axes
         private Line oxAxis = new Line(0, 0, 0, unitVectorLength, 0, 0);
@@ -48,9 +48,9 @@ namespace bakaTest
         public bool showColors = true;
 
         // accessors
-        public Surface Surface
+        public Body Body
         {
-            set { surface = value; }
+            set { body = value; }
         }
 
         ///////////////////////////////////////////////////////////
@@ -62,10 +62,17 @@ namespace bakaTest
             return one;
         }
 
-        public SurfaceRenderer(Surface _surface)
+        private Triangle toWindow(Triangle t)
         {
-            surface = _surface;
-            calculateColors();
+            t.a[0][1] = this.Height - t.a[0][1];
+            t.b[0][1] = this.Height - t.b[0][1];
+            t.c[0][1] = this.Height - t.c[0][1];
+            return t;
+        }
+
+        public SurfaceRenderer(Body _body)
+        {
+            body = _body;
             calculateTransformationMatrix();
 
             this.SetStyle(ControlStyles.UserPaint, true);
@@ -151,43 +158,14 @@ namespace bakaTest
             return value;
         }
 
-        private void calculateColors()
-        {
-            for (int i = 0; i < surface.StepsNumber - 1; ++i)
-            {
-                Matrix v1 = surface[1][i] - surface[0][i];
-                Matrix v2 = surface[0][i+1] - surface[0][i];
-
-                double x = v1[0][1] * v2[0][2] - v1[0][2] * v2[0][1];
-                double y = v1[0][2] * v2[0][0] - v1[0][0] * v2[0][2];
-                double z = v1[0][0] * v2[0][1] - v1[0][1] * v2[0][0];
-                double length = Math.Sqrt(x*x + y*y + z*z);
-
-                int r = (int) (x / length * 255);
-                int g = (int) (y / length * 255);
-                int b = (int) (z / length * 255);
-
-                r = invertIfNegative(r);
-                g = invertIfNegative(g);
-                b = invertIfNegative(b);
-                
-                colors.Add(Color.FromArgb(r, g, b)); 
-            }
-            return;
-        }
-
         // Projection
         private void projection()
         {
-            // surface
-            renderedSurface = new Surface(surface.CurvesNumber, surface.StepsNumber);
-            for (int i = 0; i < surface.CurvesNumber; ++i)
-            {
-                renderedSurface.AddCurve();
-                for (int j = 0; j < surface.StepsNumber; ++j)
-                    renderedSurface[i].Add(toWindow(surface[i][j] * transformationMatrix));
-                
-            }
+            // body
+            renderedBody = new Body();
+            for (int i = 0; i < body.TrianglesNumber; ++i)
+                renderedBody.AddTriangle(toWindow(body[i] * transformationMatrix));
+
             // axes
             renderedOxAxis.Begin = toWindow(oxAxis.Begin * transformationMatrix);
             renderedOyAxis.Begin = toWindow(oyAxis.Begin * transformationMatrix);
@@ -196,17 +174,6 @@ namespace bakaTest
             renderedOxAxis.End = toWindow(oxAxis.End * transformationMatrix);
             renderedOyAxis.End = toWindow(oyAxis.End * transformationMatrix);
             renderedOzAxis.End = toWindow(ozAxis.End * transformationMatrix);
-        }
-
-        private Color getColorByPointIndex(int i, int j, int im, int jm)
-        {
-            int r = 255*i;
-            r /= im;
-            int g = 255 * j;
-            g /= jm;
-            int b = 255 * (i + j);
-            b /= (im + jm);
-            return Color.FromArgb(r, g, b);
         }
 
         // Drawing
@@ -240,49 +207,24 @@ namespace bakaTest
                 (int)renderedOzAxis.End[0][0],
                 (int)renderedOzAxis.End[0][1]);
 
-            // surface
+            // body
             Pen meshPen = new Pen(meshColor);
 
-            // surface: mesh
-            if (showMesh)
+            for (int i = 0; i < renderedBody.TrianglesNumber; ++i)
             {
-                // mesh: along curves
-                for (int i = 0; i < renderedSurface.CurvesNumber; ++i)
-                    for (int j = 0; j < renderedSurface.StepsNumber - 1; ++j)
-                    {
-                        g.DrawLine(meshPen,
-                            (int)renderedSurface[i][j][0][0],
-                            (int)renderedSurface[i][j][0][1],
-                            (int)renderedSurface[i][j + 1][0][0],
-                            (int)renderedSurface[i][j + 1][0][1]);
-                    }
+                Point[] p = new Point[3];
+                p[0] = new Point((int)renderedBody[i].a[0][0], (int)renderedBody[i].a[0][1]);
+                p[1] = new Point((int)renderedBody[i].b[0][0], (int)renderedBody[i].b[0][1]);
+                p[2] = new Point((int)renderedBody[i].c[0][0], (int)renderedBody[i].c[0][1]);
 
-                // mesh: across curves 
-                for (int i = 0; i < renderedSurface.StepsNumber; ++i)
-                    for (int j = 0; j < renderedSurface.CurvesNumber - 1; ++j)
-                    {
-                        g.DrawLine(meshPen,
-                            (int)renderedSurface[j][i][0][0],
-                            (int)renderedSurface[j][i][0][1],
-                            (int)renderedSurface[j + 1][i][0][0],
-                            (int)renderedSurface[j + 1][i][0][1]);
-                    }
-            }
+                if (showColors)
+                {
+                    SolidBrush polyBrush = new SolidBrush(renderedBody[i].getColor);
+                    g.FillPolygon(polyBrush, p);
+                }
 
-            // surface: colors
-            if (showColors)
-            {
-                for(int i = 0; i < renderedSurface.CurvesNumber - 1; ++i)
-                    for (int j = 0; j < renderedSurface.StepsNumber - 1; ++j)
-                    {
-                        SolidBrush polyBrush = new SolidBrush(colors[j]);//getColorByPointIndex(i, j, renderedSurface.CurvesNumber, renderedSurface.StepsNumber));
-                        Point [] p = new Point[4];
-                        p[0] = new Point((int) renderedSurface[i][j][0][0], (int) renderedSurface[i][j][0][1]);
-                        p[1] = new Point((int) renderedSurface[i][j+1][0][0], (int) renderedSurface[i][j+1][0][1]);
-                        p[2] = new Point((int) renderedSurface[i+1][j+1][0][0], (int) renderedSurface[i+1][j+1][0][1]);
-                        p[3] = new Point((int) renderedSurface[i+1][j][0][0], (int) renderedSurface[i+1][j][0][1]);
-                        g.FillPolygon(polyBrush, p);
-                    }
+                if (showMesh)
+                    g.DrawPolygon(meshPen, p);
             }
         }
 
