@@ -188,6 +188,7 @@ namespace bakaTest
             Brush bgBrush = new SolidBrush(bgColor);
             g.FillRectangle(bgBrush, 0, 0, this.Width, this.Height);
 
+            /*
             // axes
             g.DrawLine(new Pen(oxColor),
                 (int)renderedOxAxis.Begin[0][0],
@@ -206,8 +207,10 @@ namespace bakaTest
                 (int)renderedOzAxis.Begin[0][1],
                 (int)renderedOzAxis.End[0][0],
                 (int)renderedOzAxis.End[0][1]);
+            */
 
             // body
+            
             Pen meshPen = new Pen(meshColor);
 
             for (int i = 0; i < renderedBody.TrianglesNumber; ++i)
@@ -297,6 +300,13 @@ namespace bakaTest
                     break;
 
 
+                case (char)Keys.Q:
+                    shiftZ += 20;
+                    break;
+
+                case (char)Keys.E:
+                    shiftZ -= 20;
+                    break;
 
                 case (char)Keys.R:
                     scale += 0.3;

@@ -1,6 +1,6 @@
 ﻿namespace bakaTest
 {
-    partial class MainForm
+    partial class VisualisationForm
     {
         /// <summary>
         /// Требуется переменная конструктора.
