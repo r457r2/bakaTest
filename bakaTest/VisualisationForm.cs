@@ -9,6 +9,13 @@ using System.Windows.Forms;
 
 namespace bakaTest
 {
+    public class ZArrayDescriptor
+    {
+        public int[,] array;
+        public int width;
+        public int height;
+    }
+
     public partial class VisualisationForm : Form
     {
         private SurfaceRenderer renderer;
@@ -25,7 +32,7 @@ namespace bakaTest
         
         public VisualisationForm()
         {
-            renderer = new SurfaceRenderer(new Body(new Surface(5, 10.5, 0.1, 1200, 0.04, 0.01, 1.57, x => (5 * Math.Sin(x / 2)))));
+            renderer = new SurfaceRenderer(new Body(new Surface(500, .015, 0.1, 500, 0.09, 0.01, 1.57, x => (5 * Math.Sin(x / 2)))));
 
             this.Size = new Size(1280, 720);
             renderer.Size = new Size(1280, 720);

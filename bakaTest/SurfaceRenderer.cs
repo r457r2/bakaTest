@@ -35,12 +35,12 @@ namespace bakaTest
         private double rotationOX = Math.PI / 4, rotationOY = Math.PI / 4, rotationOZ = 0;
 
         // colors
-        private Color bgColor   = Color.FromArgb(0x83, 0x94, 0x96);
+        private static Color bgColor   = Color.FromArgb(0x83, 0x94, 0x96);
         private Color oxColor   = Color.FromArgb(0x00, 0x47, 0xab);
         private Color oyColor   = Color.FromArgb(0xd3, 0x36, 0x82);
         private Color ozColor   = Color.FromArgb(0x7b, 0x3f, 0x00);
-        private Color meshColor = Color.FromArgb(0xff, 0xff, 0xff);
-        private Color debugColor= Color.FromArgb(0x00, 0x00, 0x00);
+        private static Color meshColor = Color.FromArgb(0xff, 0xff, 0xff);
+        private static Color debugColor = Color.FromArgb(0x00, 0x00, 0x00);
 
         private List<Color> colors = new List<Color>();
 
@@ -54,6 +54,11 @@ namespace bakaTest
         {
             set { body = value; }
         }
+
+        // brushes etc.
+        private Brush bgBrush = new SolidBrush(bgColor);
+        private Pen meshPen = new Pen(meshColor);
+        private Pen timePen = new Pen(debugColor);
 
         ///////////////////////////////////////////////////////////
         // Methods
@@ -164,6 +169,8 @@ namespace bakaTest
         // Projection
         private void projection()
         {
+            DateTime projectionStart = DateTime.Now;
+
             // body
             renderedBody = new Body();
             for (int i = 0; i < body.TrianglesNumber; ++i)
@@ -177,18 +184,22 @@ namespace bakaTest
             renderedOxAxis.End = toWindow(oxAxis.End * transformationMatrix);
             renderedOyAxis.End = toWindow(oyAxis.End * transformationMatrix);
             renderedOzAxis.End = toWindow(ozAxis.End * transformationMatrix);
+
+            TimeSpan projectionTime = DateTime.Now - projectionStart;
+            Console.WriteLine("---   proj: " + projectionTime.TotalMilliseconds.ToString("###0.00") + " ms / " + (1000 / projectionTime.TotalMilliseconds).ToString("###0.00") + " fps");
         }
 
         // Drawing
         protected override void OnPaint(PaintEventArgs ev)
         {
             base.OnPaint(ev);
+            Console.WriteLine("--->rendering");
+            DateTime renderStart = DateTime.Now;
 
             Graphics g = ev.Graphics;
             projection();
 
             // background
-            Brush bgBrush = new SolidBrush(bgColor);
             g.FillRectangle(bgBrush, 0, 0, this.Width, this.Height);
                 
             // axes
@@ -214,9 +225,8 @@ namespace bakaTest
             }
             
             // body
-            Pen meshPen = new Pen(meshColor);
-            Pen timePen = new Pen(debugColor);
             renderedBody.zsort();
+            DateTime drawStart = DateTime.Now;
 
             for (int i = 0; i < renderedBody.TrianglesNumber; ++i)
             {
@@ -247,6 +257,12 @@ namespace bakaTest
                 /*g.DrawLine(debugColor, new Point((int)renderedBody[i].inner[0][0], (int)renderedBody[i].inner[0][1]),
                     new Point((int)renderedBody[i].inner[0][0], (int)renderedBody[i].inner[0][1]-1000));*/
             }
+
+            TimeSpan drawTime = DateTime.Now - drawStart;
+            Console.WriteLine("---   draw: " + drawTime.TotalMilliseconds.ToString("###0.00") + " ms / " + (1000 / drawTime.TotalMilliseconds).ToString("###0.00") + " fps");
+
+            TimeSpan renderTime = DateTime.Now - renderStart;
+            Console.WriteLine("*** render: " + renderTime.TotalMilliseconds.ToString("###0.00") + " ms / " + (1000 / renderTime.TotalMilliseconds).ToString("###0.00") + " fps\n");
         }
 
         protected override void OnMouseWheel(MouseEventArgs e)

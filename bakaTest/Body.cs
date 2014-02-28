@@ -36,7 +36,12 @@ namespace bakaTest
 
         public void zsort()
         {
+            DateTime clipStart = DateTime.Now;
+
             triangles.Sort(sortByZ);
+
+            TimeSpan clipTime = DateTime.Now - clipStart;
+            Console.WriteLine("---   clip: " + clipTime.TotalMilliseconds.ToString("###0.00") + " ms / " + (1000 / clipTime.TotalMilliseconds).ToString("###0.00") + " fps");
         }
 
         public Body()
@@ -79,6 +84,7 @@ namespace bakaTest
                     triangles.Add(new Triangle(s[i+1][j], s[i+1][j + 1], s[i][j+1]));
                 }
             }
+            Console.WriteLine(triangles.Count + " triangles");
         }
     }
 }
