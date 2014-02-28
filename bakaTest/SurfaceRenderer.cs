@@ -39,7 +39,8 @@ namespace bakaTest
         private Color oxColor   = Color.FromArgb(0x00, 0x47, 0xab);
         private Color oyColor   = Color.FromArgb(0xd3, 0x36, 0x82);
         private Color ozColor   = Color.FromArgb(0x7b, 0x3f, 0x00);
-        private Color meshColor = Color.FromArgb(0x00, 0x00, 0x00);
+        private Color meshColor = Color.FromArgb(0xff, 0xff, 0xff);
+        private Color debugColor= Color.FromArgb(0x00, 0x00, 0x00);
 
         private List<Color> colors = new List<Color>();
 
@@ -67,6 +68,7 @@ namespace bakaTest
             t.a[0][1] = this.Height - t.a[0][1];
             t.b[0][1] = this.Height - t.b[0][1];
             t.c[0][1] = this.Height - t.c[0][1];
+            t.inner[0][1] = this.Height - t.inner[0][1];
             return t;
         }
 
@@ -147,7 +149,7 @@ namespace bakaTest
             projectionOzMatrix[3][3] = 1;
 
 
-            transformationMatrix = rotationMatrix * projectionOzMatrix * scaleMatrix * shiftMatrix;
+            transformationMatrix = rotationMatrix * scaleMatrix * shiftMatrix;
         }
 
         // Colors
@@ -188,7 +190,7 @@ namespace bakaTest
             Brush bgBrush = new SolidBrush(bgColor);
             g.FillRectangle(bgBrush, 0, 0, this.Width, this.Height);
 
-            /*
+            
             // axes
             g.DrawLine(new Pen(oxColor),
                 (int)renderedOxAxis.Begin[0][0],
@@ -207,11 +209,13 @@ namespace bakaTest
                 (int)renderedOzAxis.Begin[0][1],
                 (int)renderedOzAxis.End[0][0],
                 (int)renderedOzAxis.End[0][1]);
-            */
+            
 
             // body
             
             Pen meshPen = new Pen(meshColor);
+            Pen timePen = new Pen(debugColor);
+            renderedBody.zsort();
 
             for (int i = 0; i < renderedBody.TrianglesNumber; ++i)
             {
@@ -219,7 +223,7 @@ namespace bakaTest
                 p[0] = new Point((int)renderedBody[i].a[0][0], (int)renderedBody[i].a[0][1]);
                 p[1] = new Point((int)renderedBody[i].b[0][0], (int)renderedBody[i].b[0][1]);
                 p[2] = new Point((int)renderedBody[i].c[0][0], (int)renderedBody[i].c[0][1]);
-
+         
                 if (showColors)
                 {
                     SolidBrush polyBrush = new SolidBrush(renderedBody[i].getColor);
@@ -228,6 +232,19 @@ namespace bakaTest
 
                 if (showMesh)
                     g.DrawPolygon(meshPen, p);
+
+
+                /*g.DrawLine(meshPen, new Point((int)renderedBody[i].inner[0][0], (int)renderedBody[i].inner[0][1]),
+                    new Point((int)renderedBody[i].c[0][0], (int)renderedBody[i].c[0][1]));
+
+                g.DrawLine(meshPen, new Point((int)renderedBody[i].inner[0][0], (int)renderedBody[i].inner[0][1]),
+                    new Point((int)renderedBody[i].a[0][0], (int)renderedBody[i].a[0][1]));
+
+                g.DrawLine(meshPen, new Point((int)renderedBody[i].inner[0][0], (int)renderedBody[i].inner[0][1]),
+                    new Point((int)renderedBody[i].b[0][0], (int)renderedBody[i].b[0][1]));*/
+
+                /*g.DrawLine(debugColor, new Point((int)renderedBody[i].inner[0][0], (int)renderedBody[i].inner[0][1]),
+                    new Point((int)renderedBody[i].inner[0][0], (int)renderedBody[i].inner[0][1]-1000));*/
             }
         }
 

@@ -24,16 +24,26 @@ namespace bakaTest
             triangles.Add(t);
         }
 
+        static public int sortByZ(Triangle one, Triangle two)
+        {
+            if (one.inner[0][2] > two.inner[0][2])
+                return 1;
+            else if (one.inner[0][2] < two.inner[0][2])
+                return -1;
+            else
+                return 0;
+        }
+
         public void zsort()
         {
-            // zsort here
+            triangles.Sort(sortByZ);
         }
 
         public Body()
         {
             triangles = new List<Triangle>();
         }
-
+/*
         public Body(ZArrayDescriptor d)
         {
             List<Matrix> convertedPoints = new List<Matrix>();
@@ -55,7 +65,7 @@ namespace bakaTest
                     triangles.Add(new Triangle(convertedPoints[(i+1) * j], convertedPoints[(i+1) * (j+1)], convertedPoints[i * (j+1)]));
                 }
         }
-
+*/
         // marked for deletion
         public Body(Surface s)
         {

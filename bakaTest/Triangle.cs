@@ -11,6 +11,7 @@ namespace bakaTest
         public Matrix a;
         public Matrix b;
         public Matrix c;
+        public Matrix inner;
 
         private Color color;
 
@@ -35,6 +36,7 @@ namespace bakaTest
             c = pc;
 
             colorFromNormal();
+            findInnerPoint();
         }
 
         public Triangle(Matrix pa, Matrix pb, Matrix pc, Color col)
@@ -44,6 +46,7 @@ namespace bakaTest
             c = pc;
 
             color = col;
+            findInnerPoint();
         }
 
         private int invertIfNegative(int value)
@@ -51,6 +54,18 @@ namespace bakaTest
             if (value < 0)
                 return 0; //return 255 + value;
             return value;
+        }
+
+        public void findInnerPoint()
+        {
+            Matrix mid = a - b;
+
+            mid = 0.5 * mid;
+            mid = a - mid;
+
+            inner = c - mid;
+            inner = 0.5 * inner;
+            inner = c - inner;
         }
 
         public void colorFromNormal()

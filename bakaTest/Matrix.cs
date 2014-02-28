@@ -41,6 +41,14 @@
             get { return mtx[str]; }
         }
 
+        public static Matrix operator *(double a, Matrix m)
+        {
+            for (int i = 0; i < m.nstr; ++i)
+                for (int j = 0; j < m.ncol; ++j)
+                    m.mtx[i][j] *= a;
+            return m;
+        }
+
         public static Matrix operator *(Matrix m1, Matrix m2)
         {
             Matrix res = new Matrix(m1.nstr, m2.ncol);
@@ -60,6 +68,33 @@
                 for(int j = 0; j < m1.ncol; ++j)
                     res[i][j] = m1[i][j] - m2[i][j];
             return res;
+        }
+
+        public static Matrix operator +(Matrix m1, Matrix m2)
+        {
+            Matrix res = new Matrix(m1.nstr, m1.ncol);
+            for (int i = 0; i < m1.nstr; ++i)
+                for (int j = 0; j < m1.ncol; ++j)
+                    res[i][j] = m1[i][j] + m2[i][j];
+            return res;
+        }
+
+        public static bool operator !=(Matrix m1, Matrix m2)
+        {
+            for (int i = 0; i < m1.nstr; ++i)
+                for (int j = 0; j < m1.ncol; ++j)
+                    if (m1[i][j] != m2[i][j])
+                        return true;
+            return false;
+        }
+
+        public static bool operator ==(Matrix m1, Matrix m2)
+        {
+            for (int i = 0; i < m1.nstr; ++i)
+                for (int j = 0; j < m1.ncol; ++j)
+                    if (m1[i][j] != m2[i][j])
+                        return false;
+            return true;
         }
 
         public void ToConsole()
