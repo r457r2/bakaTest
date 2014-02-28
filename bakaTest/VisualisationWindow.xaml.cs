@@ -53,15 +53,16 @@ namespace bakaTest
                     points[i, j] = new Point3D(i, array.array[i, j], j);
 
             // build model
-
             Model3DGroup surface = new Model3DGroup();
             for (int i = 0; i < array.height - 1; ++i)
             {
                 for (int j = 0; j < array.width - 1; ++j)
                 {
+                    // upper face
                     surface.Children.Add(createTriangle(points[i, j], points[i + 1, j], points[i, j + 1]));
                     surface.Children.Add(createTriangle(points[i, j + 1], points[i + 1, j], points[i, j]));
 
+                    // lower face
                     surface.Children.Add(createTriangle(points[i, j + 1], points[i + 1, j], points[i + 1, j + 1]));
                     surface.Children.Add(createTriangle(points[i + 1, j + 1], points[i + 1, j], points[i, j + 1]));
                 }
