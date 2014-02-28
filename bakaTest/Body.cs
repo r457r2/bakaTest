@@ -33,7 +33,7 @@ namespace bakaTest
         {
             triangles = new List<Triangle>();
         }
-
+        
         public Body(ZArrayDescriptor d)
         {
             List<Matrix> convertedPoints = new List<Matrix>();
@@ -55,7 +55,7 @@ namespace bakaTest
                     triangles.Add(new Triangle(convertedPoints[(i+1) * j], convertedPoints[(i+1) * (j+1)], convertedPoints[i * (j+1)]));
                 }
         }
-
+        
         // marked for deletion
         public Body(Surface s)
         {

@@ -7,7 +7,7 @@ using System.Drawing;
 
 namespace bakaTest
 {
-    class SurfaceRenderer : Control
+    class SurfaceRenderer : UserControl
     {
         // bodies
         private Body body;
@@ -46,6 +46,7 @@ namespace bakaTest
         // misc
         public bool showMesh = false;
         public bool showColors = true;
+        public bool showAxes = false;
 
         // accessors
         public Body Body
@@ -154,7 +155,7 @@ namespace bakaTest
         private int invertIfNegative(int value)
         {
             if (value < 0)
-                return 0;//return 255 + value;
+                return 0; //return 255 + value;
             return value;
         }
 
@@ -187,30 +188,31 @@ namespace bakaTest
             // background
             Brush bgBrush = new SolidBrush(bgColor);
             g.FillRectangle(bgBrush, 0, 0, this.Width, this.Height);
-
-            /*
+                        
             // axes
-            g.DrawLine(new Pen(oxColor),
-                (int)renderedOxAxis.Begin[0][0],
-                (int)renderedOxAxis.Begin[0][1],
-                (int)renderedOxAxis.End[0][0],
-                (int)renderedOxAxis.End[0][1]);
+            if(showAxes)
+            {
+                g.DrawLine(new Pen(oxColor),
+                    (int)renderedOxAxis.Begin[0][0],
+                    (int)renderedOxAxis.Begin[0][1],
+                    (int)renderedOxAxis.End[0][0],
+                    (int)renderedOxAxis.End[0][1]);
 
-            g.DrawLine(new Pen(oyColor),
-                (int)renderedOyAxis.Begin[0][0],
-                (int)renderedOyAxis.Begin[0][1],
-                (int)renderedOyAxis.End[0][0],
-                (int)renderedOyAxis.End[0][1]);
+                g.DrawLine(new Pen(oyColor),
+                    (int)renderedOyAxis.Begin[0][0],
+                    (int)renderedOyAxis.Begin[0][1],
+                    (int)renderedOyAxis.End[0][0],
+                    (int)renderedOyAxis.End[0][1]);
 
-            g.DrawLine(new Pen(ozColor),
-                (int)renderedOzAxis.Begin[0][0],
-                (int)renderedOzAxis.Begin[0][1],
-                (int)renderedOzAxis.End[0][0],
-                (int)renderedOzAxis.End[0][1]);
-            */
+                g.DrawLine(new Pen(ozColor),
+                    (int)renderedOzAxis.Begin[0][0],
+                    (int)renderedOzAxis.Begin[0][1],
+                    (int)renderedOzAxis.End[0][0],
+                    (int)renderedOzAxis.End[0][1]);
+            }
+            
 
             // body
-            
             Pen meshPen = new Pen(meshColor);
 
             for (int i = 0; i < renderedBody.TrianglesNumber; ++i)
@@ -301,11 +303,7 @@ namespace bakaTest
 
 
                 case (char)Keys.Q:
-                    shiftZ += 20;
-                    break;
-
-                case (char)Keys.E:
-                    shiftZ -= 20;
+                    showAxes = !showAxes;
                     break;
 
                 case (char)Keys.R:
