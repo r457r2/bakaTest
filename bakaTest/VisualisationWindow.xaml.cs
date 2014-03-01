@@ -23,8 +23,8 @@ namespace bakaTest
         public static ZArrayDescriptor getSurface()
         {
             ZArrayDescriptor res = new ZArrayDescriptor();
-            res.height = 50;
-            res.width = 50;
+            res.height = 20;
+            res.width = 20;
             res.array = new int[res.height, res.width];
 
             for (int i = 0; i < res.height; ++i)
@@ -58,11 +58,9 @@ namespace bakaTest
             {
                 for (int j = 0; j < array.width - 1; ++j)
                 {
-                    // upper face
                     surface.Children.Add(createTriangle(points[i, j], points[i + 1, j], points[i, j + 1]));
                     surface.Children.Add(createTriangle(points[i, j + 1], points[i + 1, j], points[i, j]));
 
-                    // lower face
                     surface.Children.Add(createTriangle(points[i, j + 1], points[i + 1, j], points[i + 1, j + 1]));
                     surface.Children.Add(createTriangle(points[i + 1, j + 1], points[i + 1, j], points[i, j + 1]));
                 }
@@ -100,16 +98,30 @@ namespace bakaTest
             {
                 PerspectiveCamera cam = (PerspectiveCamera)this.mainViewport.Camera;
                 double rotY = (lastX - p.X) / this.Width * 3.14;
-                double rotZ = (lastY - p.Y) / this.Height * 3.14;
+                double rotR = (lastY - p.Y) / this.Height * 3.14;
 
                 double x = cam.LookDirection.X * Math.Cos(rotY) + cam.LookDirection.Z * Math.Sin(rotY);
                 double y = cam.LookDirection.Y;
                 double z = -cam.LookDirection.X * Math.Sin(rotY) + cam.LookDirection.Z * Math.Cos(rotY);
-
-                //x = cam.LookDirection.X * Math.Cos(rotZ) - cam.LookDirection.Y * Math.Sin(rotZ);
-                //y = cam.LookDirection.Y * Math.Sin(rotZ) + cam.LookDirection.Y * Math.Cos(rotZ);
-
                 cam.LookDirection = new Vector3D(x, y, z);
+
+                Vector3D axl = Vector3D.CrossProduct(cam.LookDirection, new Vector3D(0, 1, 0));
+                axl.Normalize();
+                double cosa = Math.Cos(rotR);
+                double sina = Math.Sin(rotR);
+                double cos1 = 1 - Math.Cos(rotR);
+                Matrix3D customRot = new Matrix3D();
+                customRot.M11 = axl.X * axl.X + cosa;
+                customRot.M12 = axl.X * axl.Y * cos1 - axl.Z * sina;
+                customRot.M13 = axl.X * axl.Z * cos1 + axl.Y * sina;
+                customRot.M21 = axl.X * axl.Y * cos1 + axl.Z * sina;
+                customRot.M22 = axl.Y * axl.Y * cos1 + cosa;
+                customRot.M23 = axl.Y * axl.Z * cos1 - axl.X * sina;
+                customRot.M31 = axl.X * axl.Z * cos1 - axl.Y * sina;
+                customRot.M32 = axl.X * axl.Z * cos1 + axl.X * sina;
+                customRot.M33 = axl.Z * axl.Z * cos1 + cosa;
+                //cam.LookDirection = Vector3D.Multiply(cam.LookDirection, customRot);
+                
             }
 
             lastX = p.X;
@@ -199,7 +211,7 @@ namespace bakaTest
             // calc color
             byte r = invertIfNegative(normal.X / normal.Length * 255);
             byte g = invertIfNegative(normal.Y / normal.Length * 255);
-            byte bl = invertIfNegative(normal.Y / normal.Length * 255);
+            byte bl = invertIfNegative(normal.Z / normal.Length * 255);
             Material material = new DiffuseMaterial(new SolidColorBrush(Color.FromRgb(r, g, bl)));
 
             return new GeometryModel3D(mesh, material);
