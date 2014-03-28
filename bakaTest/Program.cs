@@ -9,6 +9,8 @@ namespace bakaTest
     {
         static void Main(string[] args)
         {
+            VisualisationWindow w = new VisualisationWindow();
+            w.Run(60.0f);
         }
     }
 }
