@@ -23,7 +23,7 @@ namespace bakaTest
         // antialiasing?
         public VisualisationWindow() : base(1280, 720, new GraphicsMode()) 
         {
-            mesh = new Mesh(ZArrayDescriptor.createPerlin1d(500, 500, 6));
+            mesh = new Mesh(ZArrayDescriptor.createPerlin1d(500, 400, 6));
         }
 
         public VisualisationWindow(ZArrayDescriptor desc, int width, int height, int fsaa_samples, bool vsync)

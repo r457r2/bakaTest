@@ -168,14 +168,14 @@ namespace bakaTest
             ZArrayDescriptor z = new ZArrayDescriptor();
             z.width = height;
             z.height = width;
-            z.array = new float[z.height, z.width];
+            z.array = new float[z.width, z.height];
 
             float y = 0, x = 0;
             for (int i = 0; i < z.width; ++i, x += 0.02f)
             {
                 for (int j = 0; j < z.height; ++j, y += 0.02f)
                 {
-                    z.array[j, i] = perlinNoise(x, y, octaves);
+                    z.array[i, j] = perlinNoise(x, y, octaves);
                 }
                 y = 0.0f;
                 Console.WriteLine(i + "/" + z.width);
