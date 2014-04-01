@@ -23,7 +23,7 @@ namespace bakaTest
         // antialiasing?
         public VisualisationWindow() : base(1280, 720, new GraphicsMode()) 
         {
-            mesh = new Mesh(ZArrayDescriptor.createRandom(1080, 1920));
+            mesh = new Mesh(ZArrayDescriptor.createPerlin1d(500, 500, 6));
         }
 
         public VisualisationWindow(ZArrayDescriptor desc, int width, int height, int fsaa_samples, bool vsync)
@@ -62,17 +62,17 @@ namespace bakaTest
             CreateProgram();
 
             cam = new FreeCamera(new Vector3(0, 0, 1), new Vector3(0, 0, -5));
-            proj = new PerspectiveProjeciton(3.14159f / 4, 0.01f, 100f, (float)this.Width / this.Height);
+            proj = new PerspectiveProjeciton(3.14159f / 4, 0.01f, 5000.0f, (float)this.Width / this.Height);
 
             GL.Enable(EnableCap.DepthTest);
             GL.DepthMask(true);
             GL.DepthFunc(DepthFunction.Lequal);
             GL.DepthRange(0.0f, 1.0f);
-            GL.Enable(EnableCap.DepthClamp);
+            //GL.Enable(EnableCap.DepthClamp);
             
-            GL.Enable(EnableCap.CullFace);
-            GL.FrontFace(FrontFaceDirection.Ccw);
-            GL.CullFace(CullFaceMode.Back);
+            //GL.Enable(EnableCap.CullFace);
+            //GL.FrontFace(FrontFaceDirection.Ccw);
+            //GL.CullFace(CullFaceMode.Back);
         }
 
         float shift = 0.01f;

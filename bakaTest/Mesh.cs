@@ -17,11 +17,11 @@ namespace bakaTest
         private void invertIfNegative(ref Vector3 v)
         {
             if (v.X < 0)
-                v.X = 1 + v.X;
+                v.X = - v.X;
             if (v.Y < 0)
-                v.Y = 1 + v.Y;
+                v.Y = - v.Y;
             if (v.Z < 0)
-                v.Z = 1 + v.Z;
+                v.Z = - v.Z;
         }
 
         private Vector3 colorFromPositions(ref Vector3 p00, ref Vector3 p01, ref Vector3 p10)
