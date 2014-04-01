@@ -63,8 +63,8 @@ namespace bakaTest
             int mesh_p = 0;
             int col_offset = (desc.height - 1) * (desc.width - 1) * 2 * 3;
 
-            for(int i = 0; i < desc.height - 1; ++i)
-                for (int j = 0; j < desc.width - 1; ++j)
+            for(int i = 0; i < desc.width - 1; ++i)
+                for (int j = 0; j < desc.height - 1; ++j)
                 {
                     mesh[mesh_p++] = new Vector3(i + 1, j + 1, desc.array[i + 1, j + 1]);
                     mesh[mesh_p++] = new Vector3(i + 1, j, desc.array[i + 1, j]);
