@@ -7,7 +7,7 @@ using OpenTK;
 
 namespace bakaTest
 {
-    class FreeCamera
+    class FreeCamera : ICamera
     {
         private Vector3 worldUp = new Vector3(0, 1, 0);
 
@@ -16,14 +16,11 @@ namespace bakaTest
         private Matrix4 mtx;
         private Boolean modified = true;
 
-        public Matrix4 Matrix
+        public Matrix4 getMatrix()
         {
-            get
-            {
-                if (modified)
-                    calcMtx();
-                return mtx;
-            }
+            if (modified)
+                calcMtx();
+            return mtx;
         }
 
         public FreeCamera(Vector3 look, Vector3 pos)
@@ -102,6 +99,8 @@ namespace bakaTest
 
             modified = true;
         }
+
+        public void onMouseRightPressed(float shift) { }
 
         public void update()
         {

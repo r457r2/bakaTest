@@ -47,7 +47,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BoundCamera.cs" />
     <Compile Include="FreeCamera.cs" />
+    <Compile Include="ICamera.cs" />
     <Compile Include="Mesh.cs" />
     <Compile Include="PerspectiveProjeciton.cs" />
     <Compile Include="Program.cs" />

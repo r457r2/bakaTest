@@ -16,19 +16,22 @@ namespace bakaTest
 
         Vector2 oldMousePos;
         Mesh mesh;
-        FreeCamera cam;
+        ICamera cam;
         PerspectiveProjeciton proj;
         int projLoc, viewLoc;
         
         // antialiasing?
         public VisualisationWindow() : base(1280, 720, new GraphicsMode()) 
         {
+            //cam = new FreeCamera(new Vector3(0, 0, 1), new Vector3(0, 0, -5));
+            cam = new BoundCamera(new Vector3(250, 250, 0), 0, 1.47f, 1000.0f);
             mesh = new Mesh(ZArrayDescriptor.createPerlin1d(500, 400, 6));
         }
 
-        public VisualisationWindow(ZArrayDescriptor desc, int width, int height, int fsaa_samples, bool vsync)
+        public VisualisationWindow(ZArrayDescriptor desc, ICamera cam, int width, int height, int fsaa_samples, bool vsync)
             : base(width, height, new GraphicsMode(32, 24, 0, fsaa_samples))
         {
+            this.cam = cam;
             mesh = new Mesh(desc);
             if(!vsync)
                 this.VSync = VSyncMode.Off;
@@ -61,7 +64,6 @@ namespace bakaTest
             base.OnLoad(e);
             CreateProgram();
 
-            cam = new FreeCamera(new Vector3(0, 0, 1), new Vector3(0, 0, -5));
             proj = new PerspectiveProjeciton(3.14159f / 4, 0.01f, 5000.0f, (float)this.Width / this.Height);
 
             GL.Enable(EnableCap.DepthTest);
@@ -75,7 +77,7 @@ namespace bakaTest
             //GL.CullFace(CullFaceMode.Back);
         }
 
-        float shift = 0.01f;
+        float shift = 5.0f;
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
             cam.update();
@@ -85,6 +87,10 @@ namespace bakaTest
                 cam.rotLeft((oldMousePos.X - Mouse.X) / this.Width * (float) Math.PI);
                 cam.rotDown((oldMousePos.Y - Mouse.Y) / this.Height * (float) Math.PI);
             }
+
+            if (Mouse[MouseButton.Right])
+                cam.onMouseRightPressed(Math.Sign(Mouse.Y - oldMousePos.Y) 
+                    * Vector2.Subtract(oldMousePos, new Vector2(Mouse.X, Mouse.Y)).Length);
 
             oldMousePos.X = Mouse.X;
             oldMousePos.Y = Mouse.Y;
@@ -130,7 +136,7 @@ namespace bakaTest
             this.Title = this.RenderFrequency.ToString() + " fps";
 
             GL.UseProgram(shaderProgram);
-            Matrix4 hack = cam.Matrix;
+            Matrix4 hack = cam.getMatrix();
             GL.UniformMatrix4(viewLoc, false, ref hack);
             mesh.render();
             GL.UseProgram(0);
