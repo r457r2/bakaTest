@@ -155,7 +155,7 @@ namespace bakaTest
 
         static float perlinNoise(float x, float y, int octaves)
         {
-            float rv = 0, freq = 1, amp = 128, persistence = 0.1f;
+            float rv = 0, freq = 1, amp = 128, persistence = 0.3f;
 
             for (int i = 0; i < octaves; ++i, freq *= 2.0f, amp *= persistence)
                 rv += interpolatedNoise(x * freq, y * freq, i) * amp;

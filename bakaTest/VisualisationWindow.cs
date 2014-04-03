@@ -25,7 +25,7 @@ namespace bakaTest
         {
             //cam = new FreeCamera(new Vector3(0, 0, 1), new Vector3(0, 0, -5));
             cam = new BoundCamera(new Vector3(250, 250, 0), 0, 1.47f, 1000.0f);
-            mesh = new Mesh(ZArrayDescriptor.createPerlin1d(500, 400, 6));
+            mesh = new Mesh(ZArrayDescriptor.createPerlin1d(1000, 1000, 1));
         }
 
         public VisualisationWindow(ZArrayDescriptor desc, ICamera cam, int width, int height, int fsaa_samples, bool vsync)
@@ -64,7 +64,10 @@ namespace bakaTest
             base.OnLoad(e);
             CreateProgram();
 
-            proj = new PerspectiveProjeciton(3.14159f / 4, 0.01f, 5000.0f, (float)this.Width / this.Height);
+            proj = new PerspectiveProjeciton(3.14159f / 4, 2.0f, 5000.0f, (float)this.Width / this.Height);
+
+            GL.Enable(EnableCap.PrimitiveRestart);
+            GL.PrimitiveRestartIndex(Mesh.restartIndex);
 
             GL.Enable(EnableCap.DepthTest);
             GL.DepthMask(true);
