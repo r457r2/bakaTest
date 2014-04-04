@@ -21,11 +21,29 @@ namespace bakaTest
         int projLoc, viewLoc;
         
         // antialiasing?
-        public VisualisationWindow() : base(1280, 720, new GraphicsMode()) 
+        public VisualisationWindow() : base(100, 100, new GraphicsMode())
         {
+            this.Width = DisplayDevice.Default.Width;
+            this.Height = DisplayDevice.Default.Height - 70;
+            this.Location = new System.Drawing.Point(0, 0);
+            this.VSync = VSyncMode.Off;
+
             //cam = new FreeCamera(new Vector3(0, 0, 1), new Vector3(0, 0, -5));
             cam = new BoundCamera(new Vector3(250, 250, 0), 0, 1.47f, 1000.0f);
             mesh = new Mesh(ZArrayDescriptor.createPerlin1d(1000, 1000, 1));
+        }
+
+        public VisualisationWindow(ZArrayDescriptor desc, ICamera cam, int fsaa_samples = 0, bool vsync = false)
+            : base(100, 100, new GraphicsMode(32, 24, 0, fsaa_samples))
+        {
+            this.Width = DisplayDevice.Default.Width;
+            this.Height = DisplayDevice.Default.Height - 70;
+            this.Location = new System.Drawing.Point(0, 0);
+
+            this.cam = cam;
+            mesh = new Mesh(desc);
+            if (!vsync)
+                this.VSync = VSyncMode.Off;
         }
 
         public VisualisationWindow(ZArrayDescriptor desc, ICamera cam, int width, int height, int fsaa_samples, bool vsync)
