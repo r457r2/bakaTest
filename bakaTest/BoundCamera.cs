@@ -33,6 +33,7 @@ namespace bakaTest
         {
             // move camera around target (apply shifts)
             Vector3.Add(ref sphereRelativePos, ref camMove, out sphereRelativePos);
+            sphereRelativePos.X = (float)Math.IEEERemainder(sphereRelativePos.X, 2 * Math.PI);
             if (sphereRelativePos.Z < 1.0f)
                 sphereRelativePos.Z = 1.0f;
             if (sphereRelativePos.Y <= 0.01f)
@@ -84,7 +85,6 @@ namespace bakaTest
 
         public void rotLeft(float phi)
         {
-            // precision loss
             camMove.X -= phi;
             modified = true;
         }
