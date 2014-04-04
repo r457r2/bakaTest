@@ -160,10 +160,18 @@ namespace bakaTest
                 {
                     Vector3.Multiply(ref normals[i, j], 0.166666666f, out normals[i, j]);
                     invertIfNegative(ref normals[i, j]);
-
+                    
                     colors[ptr].V1 = (byte)(127.0f * normals[i, j].X);
                     colors[ptr].V2 = (byte)(127.0f * normals[i, j].Y);
                     colors[ptr].V3 = (byte)(127.0f * normals[i, j].Z);
+
+                    /*
+                    // colour by normal z-value (grayscale)
+                    colors[ptr].V1 = (byte)(127.0f * normals[i, j].Z);
+                    colors[ptr].V2 = (byte)(127.0f * normals[i, j].Z);
+                    colors[ptr].V3 = (byte)(127.0f * normals[i, j].Z);
+                    */
+
                     colors[ptr++].V4 = 0x7f;
                 }
             }
