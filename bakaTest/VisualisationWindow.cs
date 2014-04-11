@@ -28,9 +28,12 @@ namespace bakaTest
             this.Location = new System.Drawing.Point(0, 0);
             this.VSync = VSyncMode.Off;
 
+            mesh = Mesh.FromObject("middle aged male head_obj.obj")[0];
             //cam = new FreeCamera(new Vector3(0, 0, 1), new Vector3(0, 0, -5));
             cam = new BoundCamera(new Vector3(250, 250, 0), 0, 1.47f, 1000.0f);
-            mesh = new Mesh(ZArrayDescriptor.createPerlin1d(1000, 1000, 1));
+            //ZArrayDescriptor zarr = ZArrayDescriptor.createPerlin1d(250, 250, 1);
+            //mesh = Mesh.FromZArray(zarr, Mesh.ColoringMethod.Grayscale);
+            //Mesh.ZArrayToObject(zarr, Mesh.ColoringMethod.Fullcolor, "250.obj");
         }
 
         public VisualisationWindow(ZArrayDescriptor desc, ICamera cam, int fsaa_samples = 0, bool vsync = false)
@@ -41,7 +44,7 @@ namespace bakaTest
             this.Location = new System.Drawing.Point(0, 0);
 
             this.cam = cam;
-            mesh = new Mesh(desc);
+            mesh = Mesh.FromZArray(desc, Mesh.ColoringMethod.Fullcolor);
             if (!vsync)
                 this.VSync = VSyncMode.Off;
         }
@@ -50,7 +53,7 @@ namespace bakaTest
             : base(width, height, new GraphicsMode(32, 24, 0, fsaa_samples))
         {
             this.cam = cam;
-            mesh = new Mesh(desc);
+            mesh = Mesh.FromZArray(desc, Mesh.ColoringMethod.Fullcolor);
             if(!vsync)
                 this.VSync = VSyncMode.Off;
         }
@@ -84,8 +87,8 @@ namespace bakaTest
 
             proj = new PerspectiveProjeciton(3.14159f / 4, 2.0f, 5000.0f, (float)this.Width / this.Height);
 
-            GL.Enable(EnableCap.PrimitiveRestart);
-            GL.PrimitiveRestartIndex(Mesh.restartIndex);
+            //GL.Enable(EnableCap.PrimitiveRestart);
+            //GL.PrimitiveRestartIndex(Mesh.restartIndex);
 
             GL.Enable(EnableCap.DepthTest);
             GL.DepthMask(true);
