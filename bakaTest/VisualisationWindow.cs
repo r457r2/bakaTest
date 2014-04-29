@@ -18,7 +18,7 @@ namespace bakaTest
         Mesh mesh;
         ICamera cam;
         PerspectiveProjeciton proj;
-        int projLoc, viewLoc;
+        int projLoc, viewLoc, modelLoc;
         
         // antialiasing?
         public VisualisationWindow() : base(100, 100, new GraphicsMode())
@@ -26,17 +26,17 @@ namespace bakaTest
             this.Width = DisplayDevice.Default.Width;
             this.Height = DisplayDevice.Default.Height - 70;
             this.Location = new System.Drawing.Point(0, 0);
-            this.VSync = VSyncMode.Off;
+            this.VSync = VSyncMode.On;
 
-            mesh = Mesh.FromObject("middle aged male head_obj.obj")[0];
-            //cam = new FreeCamera(new Vector3(0, 0, 1), new Vector3(0, 0, -5));
-            cam = new BoundCamera(new Vector3(250, 250, 0), 0, 1.47f, 1000.0f);
-            //ZArrayDescriptor zarr = ZArrayDescriptor.createPerlin1d(250, 250, 1);
-            //mesh = Mesh.FromZArray(zarr, Mesh.ColoringMethod.Grayscale);
+            //mesh = Mesh.FromObject("untitled.obj")[0];
+            cam = new FreeCamera(new Vector3(0, 0, 1), new Vector3(0, 0, -5));
+            //cam = new BoundCamera(new Vector3(250, 250, 0), 0, 1.47f, 10.0f);
+            ZArrayDescriptor zarr = ZArrayDescriptor.createPerlin1d(250, 250, 1);
+            mesh = Mesh.FromZArray(zarr, Mesh.ColoringMethod.Grayscale);
             //Mesh.ZArrayToObject(zarr, Mesh.ColoringMethod.Fullcolor, "250.obj");
         }
 
-        public VisualisationWindow(ZArrayDescriptor desc, ICamera cam, int fsaa_samples = 0, bool vsync = false)
+        public VisualisationWindow(ZArrayDescriptor desc, ICamera cam, int fsaa_samples = 0, bool vsync = true)
             : base(100, 100, new GraphicsMode(32, 24, 0, fsaa_samples))
         {
             this.Width = DisplayDevice.Default.Width;
@@ -78,6 +78,7 @@ namespace bakaTest
 
             projLoc = GL.GetUniformLocation(shaderProgram, "projection");
             viewLoc = GL.GetUniformLocation(shaderProgram, "view");
+            modelLoc = GL.GetUniformLocation(shaderProgram, "model");
         }
 
         protected override void OnLoad(EventArgs e)
@@ -85,8 +86,15 @@ namespace bakaTest
             base.OnLoad(e);
             CreateProgram();
 
+            // FIXME : this is test stub
+            GL.UseProgram(shaderProgram);
+            Matrix4 hack = Matrix4.Identity;
+            GL.UniformMatrix4(modelLoc, false, ref hack);
+            GL.UseProgram(0);
+
             proj = new PerspectiveProjeciton(3.14159f / 4, 2.0f, 5000.0f, (float)this.Width / this.Height);
 
+            // Fails on hardware not supporting PrimitiveRestart
             //GL.Enable(EnableCap.PrimitiveRestart);
             //GL.PrimitiveRestartIndex(Mesh.restartIndex);
 
@@ -94,8 +102,9 @@ namespace bakaTest
             GL.DepthMask(true);
             GL.DepthFunc(DepthFunction.Lequal);
             GL.DepthRange(0.0f, 1.0f);
-            //GL.Enable(EnableCap.DepthClamp);
+            GL.Enable(EnableCap.DepthClamp);
             
+            // Useful feature ._.
             //GL.Enable(EnableCap.CullFace);
             //GL.FrontFace(FrontFaceDirection.Ccw);
             //GL.CullFace(CullFaceMode.Back);
