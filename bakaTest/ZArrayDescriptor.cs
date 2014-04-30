@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.IO;
 
+using System.Threading;
+
 namespace bakaTest
 {
     public class ZArrayDescriptor
@@ -126,7 +128,7 @@ namespace bakaTest
 
         static float interpolate(float v1, float v2, float lerp)
         {
-            float f = (float) (1.0 - Math.Cos(Math.PI * lerp)) + 0.5f;
+            float f = (float) (1.0 - Math.Cos(Math.PI * lerp)) * 0.5f;
             return v1 * (1 - f) + v2 * f;
         }
 
@@ -155,7 +157,7 @@ namespace bakaTest
 
         static float perlinNoise(float x, float y, int octaves)
         {
-            float rv = 0, freq = 1, amp = 128, persistence = 0.3f;
+            float rv = 0, freq = 1, amp = 128, persistence = 0.27f;
 
             for (int i = 0; i < octaves; ++i, freq *= 2.0f, amp *= persistence)
                 rv += interpolatedNoise(x * freq, y * freq, i) * amp;
@@ -171,9 +173,9 @@ namespace bakaTest
             z.array = new float[z.width, z.height];
 
             float y = 0, x = 0;
-            for (int i = 0; i < z.width; ++i, x += 0.02f)
+            for (int i = 0; i < z.width; ++i, x += 0.03f)
             {
-                for (int j = 0; j < z.height; ++j, y += 0.02f)
+                for (int j = 0; j < z.height; ++j, y += 0.03f)
                 {
                     z.array[i, j] = perlinNoise(x, y, octaves);
                 }

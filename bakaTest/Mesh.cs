@@ -200,12 +200,12 @@ namespace bakaTest
                     vertexPositions[i, j] = new Vector3(x, y, desc.array[i, j] - zCenterShift);
 
                     Vector3 norm1 = Vector3.Cross(
-                        Vector3.Subtract(vertexPositions[i + 1, j + 1], vertexPositions[i, j]),
-                        Vector3.Subtract(vertexPositions[i + 1, j], vertexPositions[i, j])).Normalized();
+                        vertexPositions[i + 1, j + 1] - vertexPositions[i, j],
+                        vertexPositions[i + 1, j] - vertexPositions[i, j]).Normalized();
 
                     Vector3 norm2 = Vector3.Cross(
-                        Vector3.Subtract(vertexPositions[i, j + 1], vertexPositions[i, j]),
-                        Vector3.Subtract(vertexPositions[i + 1, j + 1], vertexPositions[i, j])).Normalized();
+                        vertexPositions[i, j + 1] - vertexPositions[i, j],
+                        vertexPositions[i + 1, j + 1] - vertexPositions[i, j]).Normalized();
 
                     Vector3.Add(ref normals[i, j], ref norm1, out normals[i, j]);
                     Vector3.Add(ref normals[i + 1, j], ref norm1, out normals[i + 1, j]);
@@ -325,11 +325,10 @@ namespace bakaTest
 
         private static void AddNormal(List<Vector3> vertices, List<Vector3> normals, int i1, int i2, int i3)
         {
-            Vector3 normal = Vector3.Cross(Vector3.Subtract(vertices[i1], vertices[i2]),
-                Vector3.Subtract(vertices[i3], vertices[i2])).Normalized();
-            normals[i1] = Vector3.Add(normals[i1], normal);
-            normals[i2] = Vector3.Add(normals[i2], normal);
-            normals[i3] = Vector3.Add(normals[i3], normal);
+            Vector3 normal = Vector3.Cross(vertices[i1] - vertices[i2], vertices[i3] - vertices[i2]).Normalized();
+            normals[i1] += normal;
+            normals[i2] += normal;
+            normals[i3] += normal;
         }
 
         public static List<Mesh> FromObject(string path)

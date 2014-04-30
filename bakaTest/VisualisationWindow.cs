@@ -15,7 +15,7 @@ namespace bakaTest
         int shaderProgram;
 
         Vector2 oldMousePos;
-        Mesh mesh;
+        SceneNode node;
         ICamera cam;
         PerspectiveProjeciton proj;
         int projLoc, viewLoc, modelLoc;
@@ -28,12 +28,8 @@ namespace bakaTest
             this.Location = new System.Drawing.Point(0, 0);
             this.VSync = VSyncMode.On;
 
-            //mesh = Mesh.FromObject("untitled.obj")[0];
-            cam = new FreeCamera(new Vector3(0, 0, 1), new Vector3(0, 0, -5));
+            cam = new FreeCamera(new Vector3(0, 0, 1), new Vector3(0, 0, -700));
             //cam = new BoundCamera(new Vector3(250, 250, 0), 0, 1.47f, 10.0f);
-            ZArrayDescriptor zarr = ZArrayDescriptor.createPerlin1d(250, 250, 1);
-            mesh = Mesh.FromZArray(zarr, Mesh.ColoringMethod.Grayscale);
-            //Mesh.ZArrayToObject(zarr, Mesh.ColoringMethod.Fullcolor, "250.obj");
         }
 
         public VisualisationWindow(ZArrayDescriptor desc, ICamera cam, int fsaa_samples = 0, bool vsync = true)
@@ -44,7 +40,6 @@ namespace bakaTest
             this.Location = new System.Drawing.Point(0, 0);
 
             this.cam = cam;
-            mesh = Mesh.FromZArray(desc, Mesh.ColoringMethod.Fullcolor);
             if (!vsync)
                 this.VSync = VSyncMode.Off;
         }
@@ -53,7 +48,6 @@ namespace bakaTest
             : base(width, height, new GraphicsMode(32, 24, 0, fsaa_samples))
         {
             this.cam = cam;
-            mesh = Mesh.FromZArray(desc, Mesh.ColoringMethod.Fullcolor);
             if(!vsync)
                 this.VSync = VSyncMode.Off;
         }
@@ -86,11 +80,16 @@ namespace bakaTest
             base.OnLoad(e);
             CreateProgram();
 
-            // FIXME : this is test stub
-            GL.UseProgram(shaderProgram);
-            Matrix4 hack = Matrix4.Identity;
-            GL.UniformMatrix4(modelLoc, false, ref hack);
-            GL.UseProgram(0);
+            // production
+            //Mesh mesh = Mesh.FromZArray(desc, Mesh.ColoringMethod.Fullcolor);
+
+            // testing
+            //Mesh mesh = Mesh.FromObject("untitled.obj")[0];
+            ZArrayDescriptor zarr = ZArrayDescriptor.createPerlin1d(200, 200, 8);
+            Mesh mesh = Mesh.FromZArray(zarr, Mesh.ColoringMethod.Grayscale);
+            //Mesh Mesh.ZArrayToObject(zarr, Mesh.ColoringMethod.Fullcolor, "250.obj");
+
+            node = new SceneNode(mesh, modelLoc);
 
             proj = new PerspectiveProjeciton(3.14159f / 4, 2.0f, 5000.0f, (float)this.Width / this.Height);
 
@@ -110,7 +109,7 @@ namespace bakaTest
             //GL.CullFace(CullFaceMode.Back);
         }
 
-        float shift = 5.0f;
+        float shift = 2.5f;
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
             cam.update();
@@ -160,6 +159,22 @@ namespace bakaTest
                     proj.FieldOfView = 0.01f;
                 setProjectionUniform();
             }
+
+            if (Keyboard[Key.I])
+                node.rotate(new Vector3(1.0f, 0.0f, 0.0f), shift / 70);
+            if (Keyboard[Key.K])
+                node.rotate(new Vector3(1.0f, 0.0f, 0.0f), -shift / 70);
+            if (Keyboard[Key.J])
+                node.rotate(new Vector3(0.0f, 1.0f, 0.0f), shift / 70);
+            if (Keyboard[Key.L])
+                node.rotate(new Vector3(0.0f, 1.0f, 0.0f), -shift / 70);
+            if (Keyboard[Key.U])
+                node.rotate(new Vector3(0.0f, 0.0f, 1.0f), shift / 70);
+            if (Keyboard[Key.O])
+                node.rotate(new Vector3(0.0f, 0.0f, 1.0f), -shift / 70);
+
+            if (Keyboard[Key.Escape])
+                this.Exit();
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
@@ -171,7 +186,7 @@ namespace bakaTest
             GL.UseProgram(shaderProgram);
             Matrix4 hack = cam.getMatrix();
             GL.UniformMatrix4(viewLoc, false, ref hack);
-            mesh.render();
+            node.render();
             GL.UseProgram(0);
 
             SwapBuffers();

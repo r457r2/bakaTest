@@ -55,6 +55,7 @@
     <Compile Include="PerspectiveProjeciton.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SceneNode.cs" />
     <Compile Include="ShaderWrapper.cs" />
     <Compile Include="VisualisationWindow.cs" />
     <Compile Include="ZArrayDescriptor.cs" />
