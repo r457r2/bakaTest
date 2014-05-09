@@ -28,8 +28,8 @@ namespace bakaTest
             this.Location = new System.Drawing.Point(0, 0);
             this.VSync = VSyncMode.On;
 
-            cam = new FreeCamera(new Vector3(0, 0, 1), new Vector3(0, 0, -700));
-            //cam = new BoundCamera(new Vector3(250, 250, 0), 0, 1.47f, 10.0f);
+           // cam = new FreeCamera(new Vector3(0, 0, 1), new Vector3(0, 0, -700));
+            cam = new BoundCamera(new Vector3(0, 0, 0), 0, 1.42f, 10.0f);
         }
 
         public VisualisationWindow(ZArrayDescriptor desc, ICamera cam, int fsaa_samples = 0, bool vsync = true)

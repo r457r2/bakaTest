@@ -32,14 +32,32 @@ namespace bakaTest
         private void calcMtx()
         {
             // move camera around target (apply shifts)
+            float old_theta = sphereRelativePos.Y;
+
             Vector3.Add(ref sphereRelativePos, ref camMove, out sphereRelativePos);
             sphereRelativePos.X = (float)Math.IEEERemainder(sphereRelativePos.X, 2 * Math.PI);
+            sphereRelativePos.Y = (float)Math.IEEERemainder(sphereRelativePos.Y, 2 * Math.PI);
+
             if (sphereRelativePos.Z < 1.0f)
                 sphereRelativePos.Z = 1.0f;
-            if (sphereRelativePos.Y <= 0.01f)
-                sphereRelativePos.Y = 0.01f;
-            else if (sphereRelativePos.Y >= 3.12f)
-                sphereRelativePos.Y = 3.12f;
+
+            // pretty ugly solution that allows to remove limits on camera's vertical rotation
+            // firstly, check if angle between lookat and worldup is in critical interval
+            // (i.e. vectors are close to be parallel)
+            // if so, flip worldup
+            // next, adjust values, so actual 'rendered' angle is always outside of critical interval
+            if (old_theta > 0.01f && sphereRelativePos.Y < 0.01f
+                || old_theta < -0.01f && sphereRelativePos.Y > -0.01f
+                || old_theta > -3.13f && sphereRelativePos.Y < -3.13f
+                || old_theta < 3.13f && sphereRelativePos.Y > 3.13f)
+            {
+                worldUp = Vector3.Multiply(worldUp, -1);
+            }
+
+            if (sphereRelativePos.Y < 0.01f && sphereRelativePos.Y > -0.01f)
+                sphereRelativePos.Y = 0.011f * Math.Sign(camMove.Y);
+            else if (sphereRelativePos.Y > 3.13f || sphereRelativePos.Y < -3.13f)
+                sphereRelativePos.Y = -3.129f * Math.Sign(camMove.Y);
 
             // calculate cartesian coordinates of camera (around origin)
             Vector3 cameraPos = new Vector3((float)(Math.Sin(sphereRelativePos.Y) * Math.Cos(sphereRelativePos.X)),
