@@ -29,6 +29,16 @@ namespace bakaTest
             return mtx;
         }
 
+        public Vector3 getPosition()
+        {
+            Vector3 cameraPos = new Vector3((float)(Math.Sin(sphereRelativePos.Y) * Math.Cos(sphereRelativePos.X)),
+                (float)Math.Cos(sphereRelativePos.Y),
+                (float)(Math.Sin(sphereRelativePos.Y) * Math.Sin(sphereRelativePos.X)));
+            Vector3.Multiply(ref cameraPos, sphereRelativePos.Z, out cameraPos);
+            Vector3.Add(ref cameraPos, ref target, out cameraPos);
+            return cameraPos;
+        }
+
         private void calcMtx()
         {
             // move camera around target (apply shifts)

@@ -23,6 +23,11 @@ namespace bakaTest
             return mtx;
         }
 
+        public Vector3 getPosition()
+        {
+            return position;
+        }
+
         public FreeCamera(Vector3 look, Vector3 pos)
         {
             lookAt = look;

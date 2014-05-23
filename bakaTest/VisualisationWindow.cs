@@ -8,6 +8,8 @@ using OpenTK.Input;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 
+using Gwen.Control;
+
 namespace bakaTest
 {
     class VisualisationWindow : GameWindow
@@ -19,6 +21,36 @@ namespace bakaTest
         ICamera cam;
         PerspectiveProjeciton proj;
         int projLoc, viewLoc, modelLoc;
+
+        Gwen.Input.OpenTK gwenInput;
+        Canvas canvas;
+        StatusBar statusBar;
+        DockBase dock;
+        RadioButtonGroup radioCamera;
+        Gwen.Renderer.OpenTK renderer;
+        Label labelPosX;
+        Label labelPosY;
+        Label labelPosZ;
+        Label labelTips;
+        Label labelSpeed;
+
+        private const string boundCameraTip = @"Перемещения точки привязки:
+W, A - вперед/назад
+S, D - влево/вправо
+Space, C - вверх/вниз
+Левая кнопка мыши: вращение вокруг точки привязки
+Правая кнопка мыши: приближение/отдаление
+Колесо мыши: скорость перемещения";
+        private const string freeCameraTip = @"Перемещение камеры:
+W, A - вперед/назад
+S, D - влево/вправо
+Space, C - вверх/вниз
+Левая кнопка мыши: вращение камеры
+Колесо мыши: скорость перемещения";
+        private const string nodeTransformTip = @"Вращение объекта:
+U, O: вокруг продольной оси
+I, K: вокруг поперечной оси
+J, L: вокруг вертикальной оси";
         
         // antialiasing?
         public VisualisationWindow() : base(100, 100, new GraphicsMode())
@@ -28,8 +60,8 @@ namespace bakaTest
             this.Location = new System.Drawing.Point(0, 0);
             this.VSync = VSyncMode.On;
 
-           // cam = new FreeCamera(new Vector3(0, 0, 1), new Vector3(0, 0, -700));
-            cam = new BoundCamera(new Vector3(0, 0, 0), 0, 1.42f, 10.0f);
+            cam = new FreeCamera(new Vector3(0, 0, 1), new Vector3(0, 0, -700));
+            //cam = new BoundCamera(new Vector3(0, 0, 0), -1.57f, 1.57f, 600.0f);
         }
 
         public VisualisationWindow(ZArrayDescriptor desc, ICamera cam, int fsaa_samples = 0, bool vsync = true)
@@ -107,6 +139,112 @@ namespace bakaTest
             //GL.Enable(EnableCap.CullFace);
             //GL.FrontFace(FrontFaceDirection.Ccw);
             //GL.CullFace(CullFaceMode.Back);
+
+            setupUi();
+        }
+
+        void radioCamera_SelectionChanged(Base control, EventArgs args)
+        {
+            RadioButtonGroup rg = (RadioButtonGroup)control;
+            if (rg.SelectedName == "free")
+            {
+                cam = new FreeCamera(new Vector3(0, 0, 1), new Vector3(0, 0, -700));
+                labelTips.SetText(freeCameraTip + "\n\n" + nodeTransformTip);
+                labelTips.SizeToContents();
+            }
+            else if(rg.SelectedName == "bound")
+            {
+                cam = new BoundCamera(new Vector3(0, 0, 0), -1.57f, 1.57f, 600.0f);
+                labelTips.SetText(boundCameraTip + "\n\n" + nodeTransformTip);
+                labelTips.SizeToContents();
+            }
+        }
+
+        void cameraReset_Clicked(Base control, EventArgs args)
+        {
+            radioCamera_SelectionChanged(radioCamera, null);
+        }
+
+        private void setupUi()
+        {
+            renderer = new Gwen.Renderer.OpenTK();
+            Gwen.Skin.Base skin = new Gwen.Skin.TexturedBase(renderer, "DefaultSkin.png");
+            canvas = new Canvas(skin);
+            canvas.SetSize(Width, Height);
+
+            gwenInput = new Gwen.Input.OpenTK(this);
+            gwenInput.Initialize(canvas);
+
+            Mouse.ButtonDown += Mouse_ButtonDown;
+            Mouse.ButtonUp += Mouse_ButtonUp;
+            Mouse.Move += Mouse_Move;
+            Mouse.WheelChanged += Mouse_Wheel;
+
+            canvas.ShouldDrawBackground = true;
+            canvas.BackgroundColor = System.Drawing.Color.FromArgb(122, 150, 170, 170);
+
+            // controls
+            radioCamera = new RadioButtonGroup(canvas);
+            radioCamera.AutoSizeToContents = true;
+            radioCamera.SetText("Тип камеры");
+            radioCamera.AddOption("Свободная", "free");
+            radioCamera.AddOption("Привязанная", "bound");
+            radioCamera.SetSelection(0);
+            radioCamera.SelectionChanged += radioCamera_SelectionChanged;
+
+            // coord
+            GroupBox posGroup = new GroupBox(canvas);
+            posGroup.SetText("Позиция камеры");
+            posGroup.SizeToChildren();
+            posGroup.SetSize(150, 120);
+            Gwen.Align.PlaceDownLeft(posGroup, radioCamera, 45);
+            
+            labelPosX = new Label(posGroup);
+            labelPosY = new Label(posGroup);
+            labelPosZ = new Label(posGroup);
+            labelPosX.SetText("X: 0.0");
+            labelPosY.SetText("Y: 1.0");
+            labelPosZ.SetText("Z: 2.0");
+            Gwen.Align.PlaceDownLeft(labelPosY, labelPosX, 5);
+            Gwen.Align.PlaceDownLeft(labelPosZ, labelPosY, 5);
+
+            // reset button
+            Button resetCameraButton = new Gwen.Control.Button(posGroup);
+            resetCameraButton.SetText("Сбросить позицию\nкамеры");
+            resetCameraButton.Clicked += cameraReset_Clicked;
+            resetCameraButton.SizeToContents();
+            Gwen.Align.PlaceDownLeft(resetCameraButton, labelPosZ, 5);
+
+            labelSpeed = new Label(canvas);
+            Gwen.Align.PlaceDownLeft(labelSpeed, posGroup, 5);
+
+            labelTips = new Label(canvas);
+            labelTips.SetText(freeCameraTip + "\n\n" + nodeTransformTip);
+            labelTips.SizeToContents();
+            Gwen.Align.PlaceDownLeft(labelTips, labelSpeed, 15);
+ 
+            statusBar = new Gwen.Control.StatusBar(canvas);
+            statusBar.Dock = Gwen.Pos.Bottom;            
+        }
+
+        void Mouse_ButtonDown(object sender, MouseButtonEventArgs args)
+        {
+            gwenInput.ProcessMouseMessage(args);
+        }
+
+        void Mouse_ButtonUp(object sender, MouseButtonEventArgs args)
+        {
+            gwenInput.ProcessMouseMessage(args);
+        }
+
+        void Mouse_Move(object sender, MouseMoveEventArgs args)
+        {
+            gwenInput.ProcessMouseMessage(args);
+        }
+
+        void Mouse_Wheel(object sender, MouseWheelEventArgs args)
+        {
+            gwenInput.ProcessMouseMessage(args);
         }
 
         float shift = 2.5f;
@@ -175,6 +313,17 @@ namespace bakaTest
 
             if (Keyboard[Key.Escape])
                 this.Exit();
+
+
+            Vector3 cameraPos = cam.getPosition();
+            labelPosX.SetText("X: " + cameraPos.X);
+            labelPosY.SetText("Y: " + cameraPos.Y);
+            labelPosZ.SetText("Z: " + cameraPos.Z);
+
+            labelSpeed.SetText("Скорость перемещения: " + shift);
+
+            if (renderer.TextCacheSize > 50)
+                renderer.FlushTextCache();
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
@@ -183,11 +332,15 @@ namespace bakaTest
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             this.Title = this.RenderFrequency.ToString() + " fps";
 
+            statusBar.SetText(this.RenderFrequency.ToString());
+
             GL.UseProgram(shaderProgram);
             Matrix4 hack = cam.getMatrix();
             GL.UniformMatrix4(viewLoc, false, ref hack);
             node.render();
             GL.UseProgram(0);
+
+            canvas.RenderCanvas();
 
             SwapBuffers();
         }
@@ -203,6 +356,13 @@ namespace bakaTest
         protected override void OnResize(EventArgs e)
         {
             GL.Viewport(0, 0, this.Width, this.Height);
+
+            // canvas
+            GL.MatrixMode(MatrixMode.Projection);
+            GL.LoadIdentity();
+            GL.Ortho(0, Width, Height, 0, -1, 1);
+            canvas.SetSize(Width, Height);
+            //dock.SetSize(Width, Height);
 
             proj.AspectRatio = (float)this.Width / this.Height;
             setProjectionUniform();
